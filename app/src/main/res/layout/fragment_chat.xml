@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/chat_bg_image">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mRvRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/mRlBottom" />
+
+    <RelativeLayout
+        android:id="@+id/mRlBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#B1D1BC">
+
+        <ImageView
+            android:id="@+id/mIvUploadImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_photo_black_24dp" />
+
+        <EditText
+            android:id="@+id/mEtMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@+id/mIvUploadImage"
+            android:layout_marginTop="8dp"
+            android:layout_toStartOf="@+id/mBtSend"
+            android:hint="Write here..."
+            android:textColor="#00658F"
+            android:textColorHint="#1D7AA2" />
+
+        <Button
+            android:id="@+id/mBtSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="Send"
+            android:textAllCaps="false" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
