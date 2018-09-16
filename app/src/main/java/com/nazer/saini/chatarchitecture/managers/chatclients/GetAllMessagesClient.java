@@ -51,6 +51,7 @@ public class GetAllMessagesClient {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+
                 getAllMessagesClientCallback.onAllMessageFetchedFromServer();
             }
         });

@@ -31,8 +31,6 @@ public class ChatManager implements SendMessageClient.SendMessageCallback,
     @Override
     public void onConnected() {
 //        sendMessageClient.fetchPendingMessagesToSendServer();
-
-        sendMessageClient.startDemoChating();
     }
 
 

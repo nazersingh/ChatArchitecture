@@ -3,10 +3,12 @@ package com.nazer.saini.chatarchitecture.managers.chatclients;
 import android.os.CountDownTimer;
 import android.os.Handler;
 
+import com.nazer.saini.chatarchitecture.application.MyApplication;
 import com.nazer.saini.chatarchitecture.managers.socket.SocketManager;
 import com.nazer.saini.chatarchitecture.pojomodels.ChatMediaType;
 import com.nazer.saini.chatarchitecture.pojomodels.basemodels.ChatMessage;
 import com.nazer.saini.chatarchitecture.utils.Constants;
+import com.nazer.saini.chatarchitecture.utils.PrintLog;
 
 import java.util.HashMap;
 
@@ -32,13 +34,27 @@ public class SendMessageClient {
     /**
      * Save message in local table before sending it to server
      *
-     * @param msgBody
+     * @param chatMessage
      */
-    public void sendMessageToLocal(ChatMessage msgBody) {
+    public void sendMessageToLocal(final ChatMessage chatMessage) {
 
-//        sendMessageCallback.onLocalMessageSend(msgBody);
+        chatMessage.setIsLocalMessage(1);
+        final long id=AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().insert(chatMessage);
+        PrintLog.e("Send Message "," Insert id "+id);
+        sendMessageCallback.onLocalMessageSend(chatMessage);
 
-        callDemoChat(msgBody);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                chatMessage.setIsLocalMessage(0);
+                if (chatMessage.getMessageType().equals(ChatMediaType.IMAGE_TEXT))
+                    chatMessage.setRemoteUrl("https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg?resize=640%2C426");
+
+                AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().update(0,id);
+
+                sendMessageCallback.onServerMessageSend(chatMessage);
+            }
+        }, 1000);
     }
 
     /**
@@ -82,53 +98,4 @@ public class SendMessageClient {
     }
 
 
-    /**
-     * ========================================    Delete it after demo
-     */
-    public void startDemoChating() {
-
-
-        ChatMessage chatMessage = new ChatMessage();
-
-        chatMessage.setMessageBody("Test Message to send");
-
-        chatMessage.setMessageType(ChatMediaType.TEXT);
-        if (uid % 4 == 0)
-            chatMessage.setTempIsMessageTypeSend(true);
-        else
-            chatMessage.setTempIsMessageTypeSend(false);
-        callDemoChat(chatMessage);
-
-
-    }
-
-    /**
-     * 4 seconds interval
-     */
-    public void callDemoChat(final ChatMessage chatMessage) {
-
-        chatMessage.setUid(uid);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-
-                chatMessage.setLocalMessage(true);
-                sendMessageCallback.onLocalMessageSend(chatMessage);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        chatMessage.setLocalMessage(false);
-                        if(chatMessage.getMessageType().equals(ChatMediaType.IMAGE_TEXT))
-                            chatMessage.setRemoteUrl("https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg?resize=640%2C426");
-
-                        sendMessageCallback.onServerMessageSend(chatMessage);
-                        uid = uid + 1;
-                        startDemoChating();
-                    }
-                }, 1000);
-
-            }
-        }, 2000);
-
-    }
 }

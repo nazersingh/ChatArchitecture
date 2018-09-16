@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.nazer.saini.chatarchitecture.R;
 import com.nazer.saini.chatarchitecture.application.MyApplication;
 import com.nazer.saini.chatarchitecture.managers.chatclients.ChatManager;
@@ -35,7 +36,7 @@ import java.security.AccessController;
 import java.util.ArrayList;
 
 
-public class ChatFragment extends Fragment implements View.OnClickListener{
+public class ChatFragment extends Fragment implements View.OnClickListener {
 
     private String TAG = "ChatFragment";
 
@@ -67,11 +68,17 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         //init Presenter
         chatPresenter = new ChatPresenter(chatPresenterCallback);
         //init Presenter
+
     }
 
-    ChatPresenter.ChatPresenterCallback  chatPresenterCallback=new ChatPresenter.ChatPresenterCallback() {
+    ChatPresenter.ChatPresenterCallback chatPresenterCallback = new ChatPresenter.ChatPresenterCallback() {
         @Override
         public void getAllMessagesList(ArrayList<ChatMessage> chatMessages) {
+
+            if (!chatMessages.isEmpty()) {
+                mMessageList.addAll(chatMessages);
+                mAdapter.notifyDataSetChanged();
+            }
 
         }
     };
@@ -86,6 +93,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
             init();
             initAdapter();
+            chatPresenter.fetchChatRoomMessages();
         }
         return view;
 
@@ -141,10 +149,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             case R.id.mBtSend:
                 if (!TextUtils.isEmpty(mEtMessage.getText().toString().trim())) {
                     String newMessage = mEtMessage.getText().toString();
-                    ChatMessage chatMessage=new ChatMessage();
+                    ChatMessage chatMessage = new ChatMessage();
                     chatMessage.setMessageBody(newMessage);
-                    chatMessage.setMessageType(ChatMediaType.TEXT);
-                    chatMessage.setTempIsMessageTypeSend(true);
+                    chatMessage.setMessageType(String.valueOf(ChatMediaType.TEXT));
+                    chatMessage.setTempIsMessageTypeSend(1);
                     chatPresenter.sendMessage(chatMessage);
                     mRvRecyclerView.scrollToPosition(mMessageList.size() - 1);
                     mEtMessage.setText("");
@@ -156,7 +164,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                     requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                             REQUEST_STORAGE_PERMISSION);
                 } else {
-                    ImageVideoAudioPicker.getInstance().showImagePickerDialogue((getActivity()));
+                    ImageVideoAudioPicker.getInstance().showImageVideoDialogue((getActivity()));
                 }
                 break;
         }
@@ -170,29 +178,37 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ImageVideoAudioPicker.GALLERY_IMAGE_REQUEST || requestCode == ImageVideoAudioPicker.CAMERA_IMAGE_REQUEST) {
+
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setMessageType(String.valueOf(ChatMediaType.IMAGE_TEXT));
+                chatMessage.setTempIsMessageTypeSend(1);
                 if (requestCode == ImageVideoAudioPicker.CAMERA_IMAGE_REQUEST) {
                     try {
-                        Bitmap bitmap= ImageVideoAudioPicker.getInstance().getBitmapFromResult(getActivity(), requestCode, resultCode, data);
+                        Bitmap bitmap = ImageVideoAudioPicker.getInstance().getBitmapFromResult(getActivity(), requestCode, resultCode, data);
                         PrintLog.e(TAG, " save camera image file " + ImageVideoAudioPicker.getInstance().saveImageAndGetPath(getActivity(), bitmap));
+                        chatMessage.setLocalUrl(ImageVideoAudioPicker.getInstance().saveImageAndGetPath(getActivity(), bitmap));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }
-                else {
+                } else {
                     PrintLog.e(TAG, " gallery image file " + ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(), data.getData()));
-                    ChatMessage chatMessage=new ChatMessage();
-                    chatMessage.setMessageType(ChatMediaType.IMAGE_TEXT);
-                    chatMessage.setTempIsMessageTypeSend(true);
+
                     chatMessage.setLocalUrl(ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(), data.getData()));
-                    chatPresenter.sendMessage(chatMessage);
+
                 }
+                chatPresenter.sendMessage(chatMessage);
             }
             if (requestCode == ImageVideoAudioPicker.GALLERY_VIDEO_REQUEST || requestCode == ImageVideoAudioPicker.CAMERA_VIDEO_REQUEST) {
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setMessageType(String.valueOf(ChatMediaType.VIDEO_TEXT));
+                chatMessage.setTempIsMessageTypeSend(1);
+                chatMessage.setLocalUrl(ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(), data.getData()));
                 if (requestCode == ImageVideoAudioPicker.CAMERA_VIDEO_REQUEST) {
-                    PrintLog.e(TAG, "Camera Video File " + ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(),data.getData()));
+                    PrintLog.e(TAG, "Camera Video File " + ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(), data.getData()));
                 } else {
                     PrintLog.e(TAG, " gallery Video file " + ImageVideoAudioPicker.getInstance().getRealPathFromUri(getActivity(), data.getData()));
                 }
+                chatPresenter.sendMessage(chatMessage);
             }
         }
     }
@@ -203,16 +219,14 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     }
 
 
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
     }
 
-    ChatManager.ChatManagerCallback chatManagerCallback=new ChatManager.ChatManagerCallback() {
+    ChatManager.ChatManagerCallback chatManagerCallback = new ChatManager.ChatManagerCallback() {
         @Override
         public void onMessageReceived(ChatMessage chatMessage) {
-
 
 
         }
@@ -227,8 +241,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
         @Override
         public void onMessageSendServer(ChatMessage chatMessage) {
 
-            mMessageList.set((int) chatMessage.getUid(),chatMessage);
-            mAdapter.notifyItemChanged((int) chatMessage.getUid());
+
+            mMessageList.set(mMessageList.indexOf(chatMessage), chatMessage);
+            mAdapter.notifyItemChanged(mMessageList.indexOf(chatMessage));
             mRvRecyclerView.smoothScrollToPosition(mMessageList.size());
         }
 

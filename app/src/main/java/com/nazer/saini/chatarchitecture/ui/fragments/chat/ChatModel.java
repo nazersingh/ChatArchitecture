@@ -2,6 +2,7 @@ package com.nazer.saini.chatarchitecture.ui.fragments.chat;
 
 
 import com.nazer.saini.chatarchitecture.application.MyApplication;
+import com.nazer.saini.chatarchitecture.managers.chatclients.AppRoomDatabase;
 import com.nazer.saini.chatarchitecture.pojomodels.basemodels.ChatMessage;
 
 import java.util.ArrayList;
@@ -28,19 +29,12 @@ public class ChatModel {
     }
 
     /**
-     * fetch all messages from realm local plus remote table
+     * fetch all messages from  local plus remote table
      * sort messages according to localId in ascending order
      */
     public void fetchChatRoomMessages() {
-//        ArrayList<ChatMessage> chatMessages = chatRealmClient.fetchAllRoomMessages();
-
-//        Map<Long, ChatMessage> myTreeMap = new TreeMap<Long, ChatMessage>();
-//        for (int i = 0; i < chatMessages.size(); i++) {
-//            myTreeMap.put(chatMessages.get(i).getUid(), chatMessages.get(i));
-//        }
-
-//        ArrayList<ChatMessage> sortedChatMessages = new ArrayList<>(myTreeMap.values());
-//        chatModelCallback.getAllMessagesList(sortedChatMessages);
+        ArrayList<ChatMessage> chatMessages = (ArrayList<ChatMessage>) AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().getAll();
+        chatModelCallback.getAllMessagesList(chatMessages);
     }
 
     public interface ChatModelCallback {

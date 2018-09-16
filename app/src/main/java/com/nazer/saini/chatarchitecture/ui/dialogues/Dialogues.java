@@ -179,6 +179,30 @@ public class Dialogues {
      * ================================ Dialogues for Media Picker ==========================
      */
 
+
+    /**
+     * =========================== pick video and image
+     * @param context
+     */
+    public void showImageVideoPickerDialogue(final Activity context) {
+        getAlertDialogue(context)
+                .setTitle("Select Option")
+                .setMessage("Select Image \nSelect Video")
+                .setCancelable(isCancelable)
+                .setPositiveButton("Image", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ImageVideoAudioPicker.getInstance().showImagePickerDialogue(context);
+                    }
+                })
+                .setNegativeButton("Video", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ImageVideoAudioPicker.getInstance().showVideoPickerDialogue(context);
+                    }
+                }).show();
+
+    }
     /**
      * Image Picker
      *
@@ -217,13 +241,13 @@ public class Dialogues {
                 .setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ImageVideoAudioPicker.getInstance().pickImageFromGalleryIntent(context);
+                        ImageVideoAudioPicker.getInstance().pickVideoFromGallery(context);
                     }
                 })
                 .setNegativeButton("Camera", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ImageVideoAudioPicker.getInstance().pickImageFromCameraIntent(context);
+                        ImageVideoAudioPicker.getInstance().pickVideoFromCamera(context);
                     }
                 }).show();
 

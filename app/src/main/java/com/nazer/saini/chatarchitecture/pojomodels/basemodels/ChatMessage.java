@@ -14,8 +14,25 @@ public class ChatMessage {
     private long uid;
 
     private String messageBody = "";
-    private boolean isLocalMessage = false;
-    private boolean tempIsMessageTypeSend;
+    public  int isLocalMessage = 1;
+
+    public int getIsLocalMessage() {
+        return isLocalMessage;
+    }
+
+    public void setIsLocalMessage(int isLocalMessage) {
+        this.isLocalMessage = isLocalMessage;
+    }
+
+    public int getTempIsMessageTypeSend() {
+        return tempIsMessageTypeSend;
+    }
+
+    public void setTempIsMessageTypeSend(int tempIsMessageTypeSend) {
+        this.tempIsMessageTypeSend = tempIsMessageTypeSend;
+    }
+
+    private int tempIsMessageTypeSend;
     private long time = 0;
     private String roomId = "";
     private String localUrl = "";
@@ -24,16 +41,35 @@ public class ChatMessage {
     private String fileName = "";
     private String messageCaption = "";
     private int mediaProgress = 0;
-    private String chatMediaStatus = String.valueOf(ChatMediaStatus.UNKNOWN);
-    private String messageType = String.valueOf(ChatMediaType.TEXT);
-
-    public boolean isLocalMessage() {
-        return isLocalMessage;
+    private String messageType ;
+    public String getMessageType() {
+        return messageType;
     }
 
-    public void setLocalMessage(boolean localMessage) {
-        isLocalMessage = localMessage;
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
+
+
+
+//    private String chatMediaStatus = String.valueOf(ChatMediaStatus.UNKNOWN);
+
+
+//    public void setChatMediaStatus(String chatMediaStatus) {
+//        this.chatMediaStatus = chatMediaStatus;
+//    }
+//public ChatMediaStatus getChatMediaStatus() {
+//        return ChatMediaStatus.valueOf(chatMediaStatus);
+//    }
+//
+//    public void setChatMediaStatus(ChatMediaStatus chatMediaStatus) {
+//        this.chatMediaStatus = chatMediaStatus.toString();
+//    }
+
+
+
+
+
 
     public String getCaption() {
         return caption;
@@ -51,22 +87,7 @@ public class ChatMessage {
         this.fileName = fileName;
     }
 
-    public ChatMediaStatus getChatMediaStatus() {
-        return ChatMediaStatus.valueOf(chatMediaStatus);
-    }
-
-    public void setChatMediaStatus(ChatMediaStatus chatMediaStatus) {
-        this.chatMediaStatus = chatMediaStatus.toString();
-    }
-
-    public ChatMediaType getMessageType() {
-        return ChatMediaType.valueOf(messageType);
-    }
-
-    public void setMessageType(ChatMediaType messageType) {
-        this.messageType = messageType.toString();
-    }
-
+//
     public String getLocalUrl() {
         return localUrl;
     }
@@ -83,13 +104,7 @@ public class ChatMessage {
         this.remoteUrl = remoteUrl;
     }
 
-    public boolean getTempIsMessageTypeSend() {
-        return tempIsMessageTypeSend;
-    }
 
-    public void setTempIsMessageTypeSend(boolean tempIsMessageTypeSend) {
-        this.tempIsMessageTypeSend = tempIsMessageTypeSend;
-    }
 
 
     public long getUid() {

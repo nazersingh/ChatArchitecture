@@ -5,6 +5,7 @@
     android:background="@mipmap/chat_bg_image">
 
     <android.support.v7.widget.RecyclerView
+        android:animationCache="true"
         android:id="@+id/mRvRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

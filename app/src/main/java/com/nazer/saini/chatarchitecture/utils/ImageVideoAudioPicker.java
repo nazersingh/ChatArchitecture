@@ -1,16 +1,20 @@
 package com.nazer.saini.chatarchitecture.utils;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Camera;
 import android.media.MediaScannerConnection;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-
+import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 
 import com.nazer.saini.chatarchitecture.ui.dialogues.Dialogues;
@@ -22,6 +26,8 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import static android.app.Activity.RESULT_OK;
+import static android.support.constraint.Constraints.TAG;
+import static com.nazer.saini.chatarchitecture.BuildConfig.DEBUG;
 
 public class ImageVideoAudioPicker {
 
@@ -52,6 +58,9 @@ public class ImageVideoAudioPicker {
         Dialogues.getInstance().showImagePickerDialogue(activity);
     }
 
+    public void showImageVideoDialogue(Activity activity) {
+        Dialogues.getInstance().showImageVideoPickerDialogue(activity);
+    }
 
     /**
      * =======================================================================
@@ -132,6 +141,7 @@ public class ImageVideoAudioPicker {
 
     /**
      * =========================================== Video Picker Dialogue
+     *
      * @param activity
      */
     public void showVideoPickerDialogue(Activity activity) {
@@ -180,4 +190,18 @@ public class ImageVideoAudioPicker {
             }
         }
     }
+
+    /***
+     * ===========================   get video thumbnail
+     * @param path
+     * @return
+     */
+    public Bitmap getVideoBitmapThumbnail(String path) {
+        return ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND);
+    }
+
+    public Bitmap getImageBitmapThumbnail(String path) {
+        return ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(path), 400, 400);
+    }
+
 }

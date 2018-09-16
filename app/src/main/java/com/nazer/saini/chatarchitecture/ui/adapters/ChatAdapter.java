@@ -1,6 +1,9 @@
 package com.nazer.saini.chatarchitecture.ui.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -13,7 +16,9 @@ import com.bumptech.glide.Glide;
 import com.nazer.saini.chatarchitecture.R;
 import com.nazer.saini.chatarchitecture.pojomodels.basemodels.ChatMessage;
 import com.nazer.saini.chatarchitecture.utils.Constants;
+import com.nazer.saini.chatarchitecture.utils.ImageVideoAudioPicker;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +58,10 @@ public class ChatAdapter extends RecyclerView.Adapter {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_message_sent_image, parent, false);
             return new SentImageMessageHolder(view);
+        }else if (viewType == MESSAGE_TYPE_SEND_VIDEO) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_message_sent_video, parent, false);
+            return new SentVideoMessageHolder(view);
         } else if (viewType == MESSAGE_TYPE_RECEIVE_TEXT) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_message_received, parent, false);
@@ -82,12 +91,12 @@ public class ChatAdapter extends RecyclerView.Adapter {
             }
         }
 
-        if (chatMessage.getTempIsMessageTypeSend()) {
+        if (chatMessage.getTempIsMessageTypeSend()==1) {
             switch (chatMessage.getMessageType()) {
-                case TEXT:
+                case "TEXT":
                     SentTextMessageHolder sentMessageHolder = (SentTextMessageHolder) holder;
                     sentMessageHolder.messageText.setText(chatMessage.getMessageBody());
-                    if (!chatMessage.isLocalMessage()) {
+                    if (chatMessage.getIsLocalMessage()==0){
                         sentMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
                     } else {
                         sentMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);
@@ -103,20 +112,28 @@ public class ChatAdapter extends RecyclerView.Adapter {
                         sentMessageHolder.mLayoutBubble.setVisibility(View.GONE);
                     }
                     break;
-                case IMAGE_TEXT:
+                case "IMAGE_TEXT":
                     SentImageMessageHolder sentImageMessageHolder = (SentImageMessageHolder) holder;
                     sentImageMessageHolder.captionText.setText(chatMessage.getMessageCaption());
-                    if (!chatMessage.isLocalMessage()) {
-                        if (!TextUtils.isEmpty(chatMessage.getRemoteUrl())) {
-                            Glide.with(mContext).load(chatMessage.getRemoteUrl()).into(sentImageMessageHolder.mIvContent);
-                        }
+                    if (chatMessage.getIsLocalMessage()==0){
                         sentImageMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
                     } else {
-                        if (!TextUtils.isEmpty(chatMessage.getLocalUrl())) {
-                            Glide.with(mContext).load(chatMessage.getLocalUrl()).into(sentImageMessageHolder.mIvContent);
-                        }
                         sentImageMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);
                     }
+
+
+                        if (!TextUtils.isEmpty(chatMessage.getLocalUrl())&&new File(chatMessage.getLocalUrl()).exists()) {
+                            Glide.with(mContext).load(chatMessage.getLocalUrl()).into( sentImageMessageHolder.mIvContent);
+//                            sentImageMessageHolder.mIvContent.setImageBitmap(ImageVideoAudioPicker.getInstance().getImageBitmapThumbnail(chatMessage.getLocalUrl()));
+                        }
+                        else
+                        {
+                            if (!TextUtils.isEmpty(chatMessage.getRemoteUrl()))
+                            Glide.with(mContext).load(chatMessage.getRemoteUrl()).into( sentImageMessageHolder.mIvContent);
+                            else
+                                sentImageMessageHolder.mIvContent.setImageResource(R.drawable.ic_check);
+                        }
+
 
 
 
@@ -130,8 +147,39 @@ public class ChatAdapter extends RecyclerView.Adapter {
                         sentImageMessageHolder.mLayoutBubble.setVisibility(View.GONE);
                     }
                     break;
-                case VIDEO_TEXT:
+                case "VIDEO_TEXT":
+                    SentVideoMessageHolder sentVideoMessageHolder = (SentVideoMessageHolder) holder;
+                    sentVideoMessageHolder.captionText.setText(chatMessage.getMessageCaption());
 
+//                    Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(chatMessage.getLocalUrl(), MediaStore.Images.Thumbnails.MINI_KIND);
+
+                    if (chatMessage.getIsLocalMessage()==0){
+                        sentVideoMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
+                    } else {
+                        sentVideoMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);
+                    }
+
+                    if (!TextUtils.isEmpty(chatMessage.getLocalUrl())&&new File(chatMessage.getLocalUrl()).exists()) {
+                        Glide.with(mContext).load(chatMessage.getLocalUrl()).into( sentVideoMessageHolder.mIvContent);
+//                            sentImageMessageHolder.mIvContent.setImageBitmap(ImageVideoAudioPicker.getInstance().getImageBitmapThumbnail(chatMessage.getLocalUrl()));
+                    }
+                    else
+                    {
+                        if (!TextUtils.isEmpty(chatMessage.getRemoteUrl()))
+                            Glide.with(mContext).load(chatMessage.getRemoteUrl()).into( sentVideoMessageHolder.mIvContent);
+                        else
+                            sentVideoMessageHolder.mIvContent.setImageResource(R.drawable.ic_check);
+                    }
+
+                    if (chatMessage.getTime() != 0) {
+                        sentVideoMessageHolder.mTvTime.setText(getformatDisplayTimeInString(chatMessage.getTime()));
+                    }
+                    if (shouldTimeBubbleDisplay) {
+                        sentVideoMessageHolder.mLayoutBubble.setVisibility(View.VISIBLE);
+                        sentVideoMessageHolder.mTvTimeBubble.setText(getFormatDisplayDateBubbleInString(chatMessage.getTime()));
+                    } else {
+                        sentVideoMessageHolder.mLayoutBubble.setVisibility(View.GONE);
+                    }
                     break;
             }
 
@@ -173,26 +221,26 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @Override
     public int getItemViewType(int position) {
         ChatMessage message = mMessageList.get(position);
-        if (message.getTempIsMessageTypeSend()) {
+        if (message.getTempIsMessageTypeSend()==1) {
             switch (message.getMessageType()) {
-                case TEXT:
+                case "TEXT":
                     return MESSAGE_TYPE_SEND_TEXT;
-                case IMAGE_TEXT:
+                case "IMAGE_TEXT":
                     return MESSAGE_TYPE_SEND_IMAGE;
-                case VIDEO_TEXT:
+                case "VIDEO_TEXT":
                     return MESSAGE_TYPE_SEND_VIDEO;
             }
-        } else if (!message.getTempIsMessageTypeSend()) {
+        } else if (message.getTempIsMessageTypeSend()==0) {
             switch (message.getMessageType()) {
-                case TEXT:
+                case "TEXT":
                     return MESSAGE_TYPE_RECEIVE_TEXT;
-                case IMAGE_TEXT:
+                case "IMAGE_TEXT":
                     return MESSAGE_TYPE_RECEIVE_IMAGE;
-                case VIDEO_TEXT:
+                case "VIDEO_TEXT":
                     return MESSAGE_TYPE_RECEIVE_VIDEO;
             }
         }
-        return 0;
+        return 10;
     }
 
     public class SentTextMessageHolder extends RecyclerView.ViewHolder {
@@ -234,7 +282,27 @@ public class ChatAdapter extends RecyclerView.Adapter {
             mTvTimeBubble = itemView.findViewById(R.id.time_bubble);
         }
     }
+    public class SentVideoMessageHolder extends RecyclerView.ViewHolder {
 
+        public TextView captionText;
+        public TextView mTvTime;
+        public ImageView mIvStatus;
+        public ImageView mIvContent;
+
+        private View mLayoutBubble;
+        public TextView mTvTimeBubble;
+
+        public SentVideoMessageHolder(View itemView) {
+            super(itemView);
+            captionText = itemView.findViewById(R.id.text_caption_body);
+            mTvTime = itemView.findViewById(R.id.text_message_time);
+            mIvStatus = itemView.findViewById(R.id.mIvStatus);
+            mIvContent = itemView.findViewById(R.id.mIvContent);
+
+            mLayoutBubble = itemView.findViewById(R.id.bubble_view);
+            mTvTimeBubble = itemView.findViewById(R.id.time_bubble);
+        }
+    }
     public class ReceivedMessageHolder extends RecyclerView.ViewHolder {
 
         public TextView messageText;
