@@ -227,8 +227,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     ChatManager.ChatManagerCallback chatManagerCallback = new ChatManager.ChatManagerCallback() {
         @Override
         public void onMessageReceived(ChatMessage chatMessage) {
-
-
+            mMessageList.add(chatMessage);
+            mAdapter.notifyDataSetChanged();
+            mRvRecyclerView.smoothScrollToPosition(mMessageList.size());
         }
 
         @Override

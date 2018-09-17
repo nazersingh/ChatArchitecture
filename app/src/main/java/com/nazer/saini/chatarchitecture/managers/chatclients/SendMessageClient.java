@@ -38,23 +38,13 @@ public class SendMessageClient {
      */
     public void sendMessageToLocal(final ChatMessage chatMessage) {
 
-        chatMessage.setIsLocalMessage(1);
+        chatMessage.setIsLocalMessage(Constants.LOCAL_MSG_TRUE);
+        chatMessage.setTime(System.currentTimeMillis());
         final long id=AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().insert(chatMessage);
         PrintLog.e("Send Message "," Insert id "+id);
         sendMessageCallback.onLocalMessageSend(chatMessage);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                chatMessage.setIsLocalMessage(0);
-                if (chatMessage.getMessageType().equals(ChatMediaType.IMAGE_TEXT))
-                    chatMessage.setRemoteUrl("https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg?resize=640%2C426");
-
-                AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().update(0,id);
-
-                sendMessageCallback.onServerMessageSend(chatMessage);
-            }
-        }, 1000);
+        sendMessageToServer(chatMessage,id);
     }
 
     /**
@@ -68,23 +58,34 @@ public class SendMessageClient {
     /**
      * Once the message is fetched from local table, send it to server
      *
-     * @param message
+     * @param chatMessage
      */
-    private void sendMessageToServer(ChatMessage message) {
+    private void sendMessageToServer(final ChatMessage chatMessage,final long id) {
 
-        HashMap<String, String> sendMessagePayload = new HashMap<>();
-        sendMessagePayload.put("message", message.getMessageBody());
-        sendMessagePayload.put("chatId", message.getMessageBody());
+//        HashMap<String, String> sendMessagePayload = new HashMap<>();
+//        sendMessagePayload.put("message", message.getMessageBody());
+//        sendMessagePayload.put("chatId", message.getMessageBody());
+//
+//        SocketManager.getInstance().getSocketInstance().emit(Constants.SEND_MESSAGE, sendMessagePayload, new Ack() {
+//            @Override
+//            public void call(Object... args) {
+//
+////                sendMessageCallback.onServerMessageSend(message);
+//            }
+//        });
 
-        SocketManager.getInstance().getSocketInstance().emit(Constants.SEND_MESSAGE, sendMessagePayload, new Ack() {
+
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void call(Object... args) {
+            public void run() {
+                if (chatMessage.getMessageType().equals(ChatMediaType.IMAGE_TEXT))
+                    chatMessage.setRemoteUrl("https://i2.wp.com/beebom.com/wp-content/uploads/2016/01/Reverse-Image-Search-Engines-Apps-And-Its-Uses-2016.jpg?resize=640%2C426");
+                chatMessage.setIsLocalMessage(Constants.LOCAL_MSG_FALSE);
+                AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().update(0,id);
 
-//                sendMessageCallback.onServerMessageSend(message);
+                sendMessageCallback.onServerMessageSend(chatMessage);
             }
-        });
-
-        sendMessageCallback.onServerMessageSend(message);
+        }, 1000);
 
     }
 

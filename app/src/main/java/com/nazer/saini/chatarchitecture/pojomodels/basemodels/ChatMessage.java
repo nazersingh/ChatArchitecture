@@ -4,8 +4,6 @@ package com.nazer.saini.chatarchitecture.pojomodels.basemodels;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.nazer.saini.chatarchitecture.pojomodels.ChatMediaStatus;
-import com.nazer.saini.chatarchitecture.pojomodels.ChatMediaType;
 
 @Entity(tableName = "ChatMessage")
 public class ChatMessage {

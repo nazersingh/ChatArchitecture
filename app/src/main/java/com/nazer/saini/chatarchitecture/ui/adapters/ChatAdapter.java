@@ -96,7 +96,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 case "TEXT":
                     SentTextMessageHolder sentMessageHolder = (SentTextMessageHolder) holder;
                     sentMessageHolder.messageText.setText(chatMessage.getMessageBody());
-                    if (chatMessage.getIsLocalMessage()==0){
+                    if (chatMessage.getIsLocalMessage()==Constants.LOCAL_MSG_FALSE){
                         sentMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
                     } else {
                         sentMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);
@@ -115,7 +115,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
                 case "IMAGE_TEXT":
                     SentImageMessageHolder sentImageMessageHolder = (SentImageMessageHolder) holder;
                     sentImageMessageHolder.captionText.setText(chatMessage.getMessageCaption());
-                    if (chatMessage.getIsLocalMessage()==0){
+                    if (chatMessage.getIsLocalMessage()==Constants.LOCAL_MSG_FALSE){
                         sentImageMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
                     } else {
                         sentImageMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);
@@ -153,7 +153,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
 
 //                    Bitmap bitmap2 = ThumbnailUtils.createVideoThumbnail(chatMessage.getLocalUrl(), MediaStore.Images.Thumbnails.MINI_KIND);
 
-                    if (chatMessage.getIsLocalMessage()==0){
+                    if (chatMessage.getIsLocalMessage()==Constants.LOCAL_MSG_FALSE){
                         sentVideoMessageHolder.mIvStatus.setImageResource(R.drawable.ic_check_black_24dp);
                     } else {
                         sentVideoMessageHolder.mIvStatus.setImageResource(R.drawable.ic_watch_later_black_24dp);

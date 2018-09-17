@@ -1,12 +1,19 @@
 package com.nazer.saini.chatarchitecture.managers.chatclients;
 
 import android.os.AsyncTask;
+import android.os.Handler;
 
 
+import com.nazer.saini.chatarchitecture.application.MyApplication;
+import com.nazer.saini.chatarchitecture.managers.socket.SocketManager;
+import com.nazer.saini.chatarchitecture.pojomodels.ChatMediaType;
 import com.nazer.saini.chatarchitecture.pojomodels.basemodels.ChatMessage;
+import com.nazer.saini.chatarchitecture.utils.Constants;
+import com.nazer.saini.chatarchitecture.utils.PrintLog;
 
 import java.util.ArrayList;
 
+import io.socket.emitter.Emitter;
 
 
 public class ReceiveMessageClient {
@@ -27,7 +34,33 @@ public class ReceiveMessageClient {
         this.receiveMessageClientCallback = receiveMessageClientCallback;
 
     }
+public void registerReceiver()
+{
+//    SocketManager.getInstance().getSocketInstance().on(Constants.RECEIVE_MESSAGE, new Emitter.Listener() {
+//        @Override
+//        public void call(Object... args) {
+//            receiveMessageClientCallback.onMessageReceived();
+//        }
+//    });
 
+    new Handler().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+            ChatMessage chatMessage=new ChatMessage();
+            chatMessage.setIsLocalMessage(Constants.LOCAL_MSG_FALSE);
+            chatMessage.setMessageBody("it's Message Received");
+            chatMessage.setTempIsMessageTypeSend(0);
+            chatMessage.setTime(System.currentTimeMillis());
+            chatMessage.setMessageType(String.valueOf(ChatMediaType.TEXT));
+
+            final long id=AppRoomDatabase.getAppDatabase(MyApplication.getInstance()).chatDatabaseDao().insert(chatMessage);
+            PrintLog.e("Receive Message "," Insert id "+id);
+
+            receiveMessageClientCallback.onMessageReceived(chatMessage);
+        }
+    },5000);
+
+}
 
 
     /**

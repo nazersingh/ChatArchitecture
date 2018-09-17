@@ -28,7 +28,7 @@ public class GetAllMessagesClient {
 
     /**
      * Method for getting all messages
-     * We will query realm db for getting maximum time period message, currently we have in or db.
+     * We will query local db for getting maximum time period message, currently we have in or db.
      * Then we will query socket for getting all messages after that time period
      */
     public void getAllMessages() {

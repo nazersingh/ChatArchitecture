@@ -1,8 +1,5 @@
 package com.nazer.saini.chatarchitecture.utils;
 
-/**
- * Created by igniva-android-17 on 28/5/18.
- */
 
 public class Constants {
 
@@ -25,4 +22,6 @@ public class Constants {
     public static final String DIRECTORY_MEDIA = "media";
 
 
+    public static final int LOCAL_MSG_TRUE =1 ;
+    public static final int LOCAL_MSG_FALSE =0 ;
 }
